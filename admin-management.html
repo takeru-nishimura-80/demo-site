@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ管理システム - FAQ管理</title>
+    <title>FAQ管理システム - 管理者管理</title>
     <link rel="stylesheet" href="common/common.css">
     <link rel="stylesheet" href="common/sidebar.css">
     <style>
-        /* FAQ管理画面固有のスタイル */
+        /* 管理者管理画面固有のスタイル */
         .container {
             max-width: 1400px;
         }
@@ -192,28 +192,20 @@
             background: #f8fafc;
         }
 
-        .faq-id {
+        .admin-id {
             color: #6366f1;
             font-weight: 500;
         }
 
-        .faq-question {
+        .admin-name {
             font-weight: 500;
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .faq-answer {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .admin-email {
             color: #64748b;
         }
 
-        .category-tag {
+        .role-tag {
             display: inline-block;
             background: #f1f5f9;
             color: #475569;
@@ -221,6 +213,21 @@
             border-radius: 0.25rem;
             font-size: 0.75rem;
             font-weight: 500;
+        }
+
+        .role-tag.super-admin {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .role-tag.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-tag.viewer {
+            background: #dcfce7;
+            color: #166534;
         }
 
         /* Status Badge */
@@ -232,19 +239,19 @@
             border-radius: 0.25rem;
         }
 
-        .status-badge.approved {
+        .status-badge.active {
             background: #dcfce7;
             color: #166534;
         }
 
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-badge.rejected {
+        .status-badge.inactive {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        .status-badge.suspended {
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .action-buttons {
@@ -348,15 +355,15 @@
 
             <!-- Main Content -->
             <main class="container main-content">
-                <h1 class="page-title">FAQ管理</h1>
+                <h1 class="page-title">管理者管理</h1>
 
                 <!-- Search Section -->
                 <div class="search-section">
                     <div class="search-header">
                         <div class="search-main">
                             <div class="search-field-group">
-                                <label class="search-field-label">FAQ ID・質問検索</label>
-                                <input type="text" class="search-input" placeholder="FAQ ID・質問を入力してください" id="searchKeyword">
+                                <label class="search-field-label">管理者ID・名前・ログインID検索</label>
+                                <input type="text" class="search-input" placeholder="管理者ID・名前・ログインIDを入力してください" id="searchKeyword">
                             </div>
                             
                             <button class="search-toggle" id="searchToggle" onclick="toggleSearchConditions()">
@@ -372,39 +379,23 @@
                                 <label class="search-field-label">ステータス</label>
                                 <select class="filter-select" id="statusFilter">
                                     <option value="">すべて</option>
-                                    <option value="approved">承認済み</option>
-                                    <option value="pending">承認待ち</option>
-                                    <option value="rejected">拒否</option>
+                                    <option value="active">有効</option>
+                                    <option value="suspended">停止中</option>
                                 </select>
                             </div>
                             
                             <div class="search-field-group">
-                                <label class="search-field-label">カテゴリ</label>
-                                <select class="filter-select" id="categoryFilter">
+                                <label class="search-field-label">権限</label>
+                                <select class="filter-select" id="roleFilter">
                                     <option value="">すべて</option>
-                                    <option value="1">システム関連</option>
-                                    <option value="2">ログイン・認証</option>
-                                    <option value="3">操作方法</option>
-                                    <option value="4">システム関連 > エラー対応</option>
-                                    <option value="5">システム関連 > 設定変更</option>
-                                    <option value="6">ログイン・認証 > パスワード関連</option>
-                                    <option value="7">ログイン・認証 > アカウント管理</option>
-                                </select>
-                            </div>
-                            
-                            <div class="search-field-group">
-                                <label class="search-field-label">生成元</label>
-                                <select class="filter-select" id="sourceFilter">
-                                    <option value="">すべて</option>
-                                    <option value="manual">手動作成</option>
-                                    <option value="ai">AI自動生成</option>
-                                    <option value="upload">ファイルアップロード</option>
+                                    <option value="admin">管理者</option>
+                                    <option value="viewer">閲覧者</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="search-actions">
-                            <button class="btn btn-primary" onclick="searchFaqs()">検索</button>
+                            <button class="btn btn-primary" onclick="searchAdmins()">検索</button>
                             <button class="btn btn-secondary" onclick="clearSearch()">クリア</button>
                         </div>
                     </div>
@@ -413,7 +404,7 @@
                 <!-- Table Section -->
                 <div class="table-section">
                     <div class="table-header">
-                        <div class="results-info" id="resultsInfo">127件該当 / 127件中1～20件目</div>
+                        <div class="results-info" id="resultsInfo">8件該当 / 8件中1～8件目</div>
                         <div class="table-actions">
                             <div class="table-controls">
                                 <select class="page-size-select" id="pageSize" onchange="changePageSize()">
@@ -422,7 +413,7 @@
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                            <button class="btn btn-success" onclick="window.location.href='faq-registration.html'">新規作成</button>
+                            <button class="btn btn-success" onclick="window.location.href='admin-registration.html'">新規作成</button>
                         </div>
                     </div>
 
@@ -430,77 +421,54 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">FAQ ID</th>
+                                    <th style="width: 80px;">管理者ID</th>
                                     <th style="width: 120px;">ステータス</th>
-                                    <th>質問</th>
-                                    <th>回答</th>
-                                    <th style="width: 150px;">カテゴリ</th>
-                                    <th style="width: 120px;">生成元</th>
+                                    <th>名前</th>
+                                    <th>ログインID</th>
+                                    <th style="width: 120px;">権限</th>
                                     <th style="width: 100px;">登録日</th>
-                                    <th style="width: 100px;">更新日</th>
-                                    <th style="width: 120px;">操作</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=1" class="faq-id" style="text-decoration: none; cursor: pointer;">1</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">AIチャットボットの使い方を教えてください</div></td>
-                                    <td><div class="faq-answer">AIチャットボットは画面右下のチャットアイコンをクリックして起動できます。質問を入力すると、AIが適切な回答を提供します...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
+                                    <td><a href="admin-detail-edit.html?id=1" class="admin-id" style="text-decoration: none; cursor: pointer;">1</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="admin-name">田中 太郎</div></td>
+                                    <td><div class="admin-login-id">tanaka_admin</div></td>
+                                    <td><span class="role-tag admin">管理者</span></td>
+                                    <td>2024-01-15</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=2" class="faq-id" style="text-decoration: none; cursor: pointer;">2</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">パスワードをリセットする方法</div></td>
-                                    <td><div class="faq-answer">パスワードのリセットは、ログイン画面の「パスワードを忘れた方はこちら」リンクから行えます。登録されたメールアドレスにリセット用のリンクが送信されます...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
-                                    <td>2025-01-14</td>
-                                    <td>2025-01-14</td>
-                                    <td>-</td>
+                                    <td><a href="admin-detail-edit.html?id=2" class="admin-id" style="text-decoration: none; cursor: pointer;">2</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="admin-name">佐藤 花子</div></td>
+                                    <td><div class="admin-login-id">sato_admin</div></td>
+                                    <td><span class="role-tag admin">管理者</span></td>
+                                    <td>2024-02-10</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=3" class="faq-id" style="text-decoration: none; cursor: pointer;">3</a></td>
-                                    <td><span class="status-badge pending">承認待ち</span></td>
-                                    <td><div class="faq-question">ダッシュボードの見方について</div></td>
-                                    <td><div class="faq-answer">ダッシュボードには、FAQ数の統計情報や最近のFAQ、承認待ちの項目が表示されます。左側のサイドバーから各機能にアクセスできます...</div></td>
-                                    <td><span class="category-tag">操作方法</span></td>
-                                    <td><span class="category-tag">ファイルアップロード</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn btn-success btn-small" onclick="approveFaq(3)">承認</button>
-                                            <button class="btn btn-delete btn-small" onclick="rejectFaq(3)">拒否</button>
-                                        </div>
-                                    </td>
+                                    <td><a href="admin-detail-edit.html?id=3" class="admin-id" style="text-decoration: none; cursor: pointer;">3</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="admin-name">鈴木 次郎</div></td>
+                                    <td><div class="admin-login-id">suzuki_viewer</div></td>
+                                    <td><span class="role-tag viewer">閲覧者</span></td>
+                                    <td>2024-03-05</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=4" class="faq-id" style="text-decoration: none; cursor: pointer;">4</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">システムエラーが発生した場合の対処法</div></td>
-                                    <td><div class="faq-answer">システムエラーが発生した場合は、まずブラウザをリフレッシュしてください。問題が解決しない場合は、ブラウザのキャッシュをクリアするか...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-13</td>
-                                    <td>2025-01-13</td>
-                                    <td>-</td>
+                                    <td><a href="admin-detail-edit.html?id=4" class="admin-id" style="text-decoration: none; cursor: pointer;">4</a></td>
+                                    <td><span class="status-badge suspended">停止中</span></td>
+                                    <td><div class="admin-name">高橋 三郎</div></td>
+                                    <td><div class="admin-login-id">takahashi_viewer</div></td>
+                                    <td><span class="role-tag viewer">閲覧者</span></td>
+                                    <td>2024-04-12</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=5" class="faq-id" style="text-decoration: none; cursor: pointer;">5</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">ログインができない場合の解決方法</div></td>
-                                    <td><div class="faq-answer">ログインができない場合は、以下の手順で確認してください。1. ユーザー名とパスワードが正しいか確認 2. Caps Lockがオンになっていないか確認...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
-                                    <td>2025-01-12</td>
-                                    <td>2025-01-12</td>
-                                    <td>-</td>
+                                    <td><a href="admin-detail-edit.html?id=5" class="admin-id" style="text-decoration: none; cursor: pointer;">5</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="admin-name">山田 美咲</div></td>
+                                    <td><div class="admin-login-id">yamada_admin</div></td>
+                                    <td><span class="role-tag admin">管理者</span></td>
+                                    <td>2024-05-20</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -508,13 +476,11 @@
 
                     <!-- Pagination -->
                     <div class="pagination">
-                        <div class="table-info">1-20 / 127件を表示</div>
+                        <div class="table-info">1-8 / 8件を表示</div>
                         <div class="pagination-controls">
                             <button class="pagination-button" disabled>← 前</button>
                             <button class="pagination-button active">1</button>
-                            <button class="pagination-button">2</button>
-                            <button class="pagination-button">3</button>
-                            <button class="pagination-button">次 →</button>
+                            <button class="pagination-button" disabled>次 →</button>
                         </div>
                     </div>
                 </div>
@@ -524,9 +490,7 @@
 
     <script src="common/sidebar.js"></script>
     <script>
-        // FAQ管理画面固有の機能
-        let isEditMode = false;
-        let currentEditId = null;
+        // 管理者管理画面固有の機能
 
         // Search toggle functionality
         function toggleSearchConditions() {
@@ -538,24 +502,22 @@
         }
 
         // Search functions
-        function searchFaqs() {
+        function searchAdmins() {
             const keyword = document.getElementById('searchKeyword').value;
             const status = document.getElementById('statusFilter').value;
-            const category = document.getElementById('categoryFilter').value;
-            const source = document.getElementById('sourceFilter').value;
+            const role = document.getElementById('roleFilter').value;
             
-            console.log('検索実行:', { keyword, status, category, source });
+            console.log('検索実行:', { keyword, status, role });
             // Implement search logic here
             
             // Update results info
-            updateResultsInfo(127, 127, 1, 20);
+            updateResultsInfo(8, 8, 1, 8);
         }
 
         function clearSearch() {
             document.getElementById('searchKeyword').value = '';
             document.getElementById('statusFilter').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('sourceFilter').value = '';
+            document.getElementById('roleFilter').value = '';
             
             console.log('検索条件クリア');
             // Implement clear logic here
@@ -573,22 +535,6 @@
             // Implement page size change logic here
         }
 
-        // FAQ actions
-        function approveFaq(id) {
-            if (confirm('このFAQを承認しますか？')) {
-                console.log('FAQ承認:', id);
-                alert('FAQが承認されました');
-                location.reload();
-            }
-        }
-
-        function rejectFaq(id) {
-            if (confirm('このFAQを拒否しますか？')) {
-                console.log('FAQ拒否:', id);
-                alert('FAQが拒否されました');
-                location.reload();
-            }
-        }
 
         // Pagination
         document.querySelectorAll('.pagination-button').forEach(btn => {

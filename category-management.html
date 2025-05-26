@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ管理システム - FAQ管理</title>
+    <title>FAQ管理システム - カテゴリ管理</title>
     <link rel="stylesheet" href="common/common.css">
     <link rel="stylesheet" href="common/sidebar.css">
     <style>
-        /* FAQ管理画面固有のスタイル */
+        /* カテゴリ管理画面固有のスタイル */
         .container {
             max-width: 1400px;
         }
@@ -192,34 +192,53 @@
             background: #f8fafc;
         }
 
-        .faq-id {
+        .category-id {
             color: #6366f1;
             font-weight: 500;
         }
 
-        .faq-question {
+        .category-name {
             font-weight: 500;
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .faq-answer {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #64748b;
+        .category-hierarchy {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .category-tag {
+        .hierarchy-level {
             display: inline-block;
             background: #f1f5f9;
             color: #475569;
-            padding: 0.25rem 0.5rem;
+            padding: 0.125rem 0.375rem;
             border-radius: 0.25rem;
             font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .hierarchy-level.level-1 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .hierarchy-level.level-2 {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .hierarchy-level.level-3 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .parent-category {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .display-order {
+            text-align: center;
             font-weight: 500;
         }
 
@@ -232,17 +251,12 @@
             border-radius: 0.25rem;
         }
 
-        .status-badge.approved {
+        .status-badge.active {
             background: #dcfce7;
             color: #166534;
         }
 
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-badge.rejected {
+        .status-badge.inactive {
             background: #fee2e2;
             color: #991b1b;
         }
@@ -348,15 +362,15 @@
 
             <!-- Main Content -->
             <main class="container main-content">
-                <h1 class="page-title">FAQ管理</h1>
+                <h1 class="page-title">カテゴリ管理</h1>
 
                 <!-- Search Section -->
                 <div class="search-section">
                     <div class="search-header">
                         <div class="search-main">
                             <div class="search-field-group">
-                                <label class="search-field-label">FAQ ID・質問検索</label>
-                                <input type="text" class="search-input" placeholder="FAQ ID・質問を入力してください" id="searchKeyword">
+                                <label class="search-field-label">カテゴリID・カテゴリ名検索</label>
+                                <input type="text" class="search-input" placeholder="カテゴリID・カテゴリ名を入力してください" id="searchKeyword">
                             </div>
                             
                             <button class="search-toggle" id="searchToggle" onclick="toggleSearchConditions()">
@@ -372,39 +386,14 @@
                                 <label class="search-field-label">ステータス</label>
                                 <select class="filter-select" id="statusFilter">
                                     <option value="">すべて</option>
-                                    <option value="approved">承認済み</option>
-                                    <option value="pending">承認待ち</option>
-                                    <option value="rejected">拒否</option>
-                                </select>
-                            </div>
-                            
-                            <div class="search-field-group">
-                                <label class="search-field-label">カテゴリ</label>
-                                <select class="filter-select" id="categoryFilter">
-                                    <option value="">すべて</option>
-                                    <option value="1">システム関連</option>
-                                    <option value="2">ログイン・認証</option>
-                                    <option value="3">操作方法</option>
-                                    <option value="4">システム関連 > エラー対応</option>
-                                    <option value="5">システム関連 > 設定変更</option>
-                                    <option value="6">ログイン・認証 > パスワード関連</option>
-                                    <option value="7">ログイン・認証 > アカウント管理</option>
-                                </select>
-                            </div>
-                            
-                            <div class="search-field-group">
-                                <label class="search-field-label">生成元</label>
-                                <select class="filter-select" id="sourceFilter">
-                                    <option value="">すべて</option>
-                                    <option value="manual">手動作成</option>
-                                    <option value="ai">AI自動生成</option>
-                                    <option value="upload">ファイルアップロード</option>
+                                    <option value="active">有効</option>
+                                    <option value="inactive">停止中</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="search-actions">
-                            <button class="btn btn-primary" onclick="searchFaqs()">検索</button>
+                            <button class="btn btn-primary" onclick="searchCategories()">検索</button>
                             <button class="btn btn-secondary" onclick="clearSearch()">クリア</button>
                         </div>
                     </div>
@@ -413,7 +402,7 @@
                 <!-- Table Section -->
                 <div class="table-section">
                     <div class="table-header">
-                        <div class="results-info" id="resultsInfo">127件該当 / 127件中1～20件目</div>
+                        <div class="results-info" id="resultsInfo">12件該当 / 12件中1～12件目</div>
                         <div class="table-actions">
                             <div class="table-controls">
                                 <select class="page-size-select" id="pageSize" onchange="changePageSize()">
@@ -422,7 +411,7 @@
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                            <button class="btn btn-success" onclick="window.location.href='faq-registration.html'">新規作成</button>
+                            <button class="btn btn-success" onclick="window.location.href='category-registration.html'">新規作成</button>
                         </div>
                     </div>
 
@@ -430,77 +419,105 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">FAQ ID</th>
+                                    <th style="width: 80px;">ID</th>
                                     <th style="width: 120px;">ステータス</th>
-                                    <th>質問</th>
-                                    <th>回答</th>
-                                    <th style="width: 150px;">カテゴリ</th>
-                                    <th style="width: 120px;">生成元</th>
-                                    <th style="width: 100px;">登録日</th>
+                                    <th>カテゴリ名</th>
+                                    <th style="width: 150px;">親カテゴリ</th>
+                                    <th style="width: 80px;">表示順</th>
+                                    <th style="width: 100px;">作成日</th>
                                     <th style="width: 100px;">更新日</th>
-                                    <th style="width: 120px;">操作</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=1" class="faq-id" style="text-decoration: none; cursor: pointer;">1</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">AIチャットボットの使い方を教えてください</div></td>
-                                    <td><div class="faq-answer">AIチャットボットは画面右下のチャットアイコンをクリックして起動できます。質問を入力すると、AIが適切な回答を提供します...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
+                                    <td><a href="category-detail-edit.html?id=1" class="category-id" style="text-decoration: none; cursor: pointer;">1</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">システム関連</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=2" class="faq-id" style="text-decoration: none; cursor: pointer;">2</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">パスワードをリセットする方法</div></td>
-                                    <td><div class="faq-answer">パスワードのリセットは、ログイン画面の「パスワードを忘れた方はこちら」リンクから行えます。登録されたメールアドレスにリセット用のリンクが送信されます...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
-                                    <td>2025-01-14</td>
-                                    <td>2025-01-14</td>
-                                    <td>-</td>
+                                    <td><a href="category-detail-edit.html?id=2" class="category-id" style="text-decoration: none; cursor: pointer;">2</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">ログイン・認証</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=3" class="faq-id" style="text-decoration: none; cursor: pointer;">3</a></td>
-                                    <td><span class="status-badge pending">承認待ち</span></td>
-                                    <td><div class="faq-question">ダッシュボードの見方について</div></td>
-                                    <td><div class="faq-answer">ダッシュボードには、FAQ数の統計情報や最近のFAQ、承認待ちの項目が表示されます。左側のサイドバーから各機能にアクセスできます...</div></td>
-                                    <td><span class="category-tag">操作方法</span></td>
-                                    <td><span class="category-tag">ファイルアップロード</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn btn-success btn-small" onclick="approveFaq(3)">承認</button>
-                                            <button class="btn btn-delete btn-small" onclick="rejectFaq(3)">拒否</button>
-                                        </div>
-                                    </td>
+                                    <td><a href="category-detail-edit.html?id=3" class="category-id" style="text-decoration: none; cursor: pointer;">3</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">操作方法</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">3</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=4" class="faq-id" style="text-decoration: none; cursor: pointer;">4</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">システムエラーが発生した場合の対処法</div></td>
-                                    <td><div class="faq-answer">システムエラーが発生した場合は、まずブラウザをリフレッシュしてください。問題が解決しない場合は、ブラウザのキャッシュをクリアするか...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-13</td>
-                                    <td>2025-01-13</td>
-                                    <td>-</td>
+                                    <td><a href="category-detail-edit.html?id=4" class="category-id" style="text-decoration: none; cursor: pointer;">4</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">エラー対応</div></td>
+                                    <td><span class="parent-category">システム関連</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=5" class="faq-id" style="text-decoration: none; cursor: pointer;">5</a></td>
-                                    <td><span class="status-badge approved">承認済み</span></td>
-                                    <td><div class="faq-question">ログインができない場合の解決方法</div></td>
-                                    <td><div class="faq-answer">ログインができない場合は、以下の手順で確認してください。1. ユーザー名とパスワードが正しいか確認 2. Caps Lockがオンになっていないか確認...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
+                                    <td><a href="category-detail-edit.html?id=5" class="category-id" style="text-decoration: none; cursor: pointer;">5</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">設定変更</div></td>
+                                    <td><span class="parent-category">システム関連</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=6" class="category-id" style="text-decoration: none; cursor: pointer;">6</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワード関連</div></td>
+                                    <td><span class="parent-category">ログイン・認証</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=7" class="category-id" style="text-decoration: none; cursor: pointer;">7</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">アカウント管理</div></td>
+                                    <td><span class="parent-category">ログイン・認証</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=8" class="category-id" style="text-decoration: none; cursor: pointer;">8</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワードリセット</div></td>
+                                    <td><span class="parent-category">パスワード関連</span></td>
+                                    <td><div class="display-order">1</div></td>
                                     <td>2025-01-12</td>
                                     <td>2025-01-12</td>
-                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=9" class="category-id" style="text-decoration: none; cursor: pointer;">9</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワード変更</div></td>
+                                    <td><span class="parent-category">パスワード関連</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-12</td>
+                                    <td>2025-01-12</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=10" class="category-id" style="text-decoration: none; cursor: pointer;">10</a></td>
+                                    <td><span class="status-badge inactive">停止中</span></td>
+                                    <td><div class="category-name">旧カテゴリ</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">999</div></td>
+                                    <td>2025-01-05</td>
+                                    <td>2025-01-15</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -508,13 +525,11 @@
 
                     <!-- Pagination -->
                     <div class="pagination">
-                        <div class="table-info">1-20 / 127件を表示</div>
+                        <div class="table-info">1-10 / 12件を表示</div>
                         <div class="pagination-controls">
                             <button class="pagination-button" disabled>← 前</button>
                             <button class="pagination-button active">1</button>
-                            <button class="pagination-button">2</button>
-                            <button class="pagination-button">3</button>
-                            <button class="pagination-button">次 →</button>
+                            <button class="pagination-button" disabled>次 →</button>
                         </div>
                     </div>
                 </div>
@@ -524,9 +539,7 @@
 
     <script src="common/sidebar.js"></script>
     <script>
-        // FAQ管理画面固有の機能
-        let isEditMode = false;
-        let currentEditId = null;
+        // カテゴリ管理画面固有の機能
 
         // Search toggle functionality
         function toggleSearchConditions() {
@@ -538,24 +551,20 @@
         }
 
         // Search functions
-        function searchFaqs() {
+        function searchCategories() {
             const keyword = document.getElementById('searchKeyword').value;
             const status = document.getElementById('statusFilter').value;
-            const category = document.getElementById('categoryFilter').value;
-            const source = document.getElementById('sourceFilter').value;
             
-            console.log('検索実行:', { keyword, status, category, source });
+            console.log('検索実行:', { keyword, status });
             // Implement search logic here
             
             // Update results info
-            updateResultsInfo(127, 127, 1, 20);
+            updateResultsInfo(12, 12, 1, 10);
         }
 
         function clearSearch() {
             document.getElementById('searchKeyword').value = '';
             document.getElementById('statusFilter').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('sourceFilter').value = '';
             
             console.log('検索条件クリア');
             // Implement clear logic here
@@ -571,23 +580,6 @@
             const pageSize = document.getElementById('pageSize').value;
             console.log('表示件数変更:', pageSize);
             // Implement page size change logic here
-        }
-
-        // FAQ actions
-        function approveFaq(id) {
-            if (confirm('このFAQを承認しますか？')) {
-                console.log('FAQ承認:', id);
-                alert('FAQが承認されました');
-                location.reload();
-            }
-        }
-
-        function rejectFaq(id) {
-            if (confirm('このFAQを拒否しますか？')) {
-                console.log('FAQ拒否:', id);
-                alert('FAQが拒否されました');
-                location.reload();
-            }
         }
 
         // Pagination
