@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ管理システム - FAQ管理</title>
+    <title>FAQ管理システム - 会話ログ管理</title>
     <link rel="stylesheet" href="common/common.css">
     <link rel="stylesheet" href="common/sidebar.css">
     <style>
-        /* FAQ管理画面固有のスタイル */
+        /* 会話ログ管理画面固有のスタイル */
         .container {
             max-width: 1400px;
         }
@@ -52,6 +52,27 @@
         }
 
         .search-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .date-range-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background: white;
+            width: 160px;
+        }
+
+        .date-input:focus {
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
@@ -192,12 +213,12 @@
             background: #f8fafc;
         }
 
-        .faq-id {
+        .chat-id {
             color: #6366f1;
             font-weight: 500;
         }
 
-        .faq-question {
+        .chat-question {
             font-weight: 500;
             max-width: 300px;
             overflow: hidden;
@@ -205,22 +226,20 @@
             white-space: nowrap;
         }
 
-        .faq-answer {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .chat-user {
             color: #64748b;
+            font-size: 0.8125rem;
         }
 
-        .category-tag {
-            display: inline-block;
-            background: #f1f5f9;
-            color: #475569;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
+        .turn-count {
+            text-align: center;
             font-weight: 500;
+            color: #1f2937;
+        }
+
+        .duration {
+            text-align: center;
+            color: #64748b;
         }
 
         /* Status Badge */
@@ -232,19 +251,43 @@
             border-radius: 0.25rem;
         }
 
-        .status-badge.approved {
+        .status-badge.resolved {
             background: #dcfce7;
             color: #166534;
         }
 
-        .status-badge.pending {
+        .status-badge.unresolved {
             background: #fef3c7;
             color: #92400e;
         }
 
-        .status-badge.rejected {
+        .status-badge.ongoing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Evaluation Badge */
+        .eval-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 0.25rem;
+        }
+
+        .eval-badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .eval-badge.bad {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        .eval-badge.none {
+            background: #f1f5f9;
+            color: #64748b;
         }
 
         .action-buttons {
@@ -293,6 +336,18 @@
             color: white;
         }
 
+        /* Export Button */
+        .btn-export {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+
+        .btn-export:hover {
+            background: #047857;
+            border-color: #047857;
+        }
+
         /* レスポンシブ */
         @media (max-width: 768px) {
             .table-header {
@@ -322,6 +377,16 @@
             .search-conditions-grid {
                 grid-template-columns: 1fr;
             }
+
+            .date-range-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-input {
+                width: 100%;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -338,7 +403,7 @@
             <header class="header">
                 <div class="container">
                     <div class="header-content">
-                        <div class="page-breadcrumb"></div>
+                        <div class="page-breadcrumb">会話ログ管理</div>
                         <div class="user-info">
                             <span>管理者</span>
                         </div>
@@ -348,20 +413,29 @@
 
             <!-- Main Content -->
             <main class="container main-content">
-                <h1 class="page-title">FAQ管理</h1>
+                <h1 class="page-title">会話ログ管理</h1>
 
                 <!-- Search Section -->
                 <div class="search-section">
                     <div class="search-header">
                         <div class="search-main">
                             <div class="search-field-group">
-                                <label class="search-field-label">FAQ ID・質問検索</label>
-                                <input type="text" class="search-input" placeholder="FAQ ID・質問を入力してください" id="searchKeyword">
+                                <label class="search-field-label">キーワード検索</label>
+                                <input type="text" class="search-input" placeholder="質問内容・回答内容を入力してください" id="searchKeyword">
+                            </div>
+                            
+                            <div class="search-field-group">
+                                <label class="search-field-label">会話日時</label>
+                                <div class="date-range-group">
+                                    <input type="date" class="date-input" id="dateFrom">
+                                    <span>〜</span>
+                                    <input type="date" class="date-input" id="dateTo">
+                                </div>
                             </div>
                             
                             <button class="search-toggle" id="searchToggle" onclick="toggleSearchConditions()">
                                 <span class="search-toggle-icon">▼</span>
-                                検索条件
+                                詳細検索条件
                             </button>
                         </div>
                     </div>
@@ -369,42 +443,19 @@
                     <div class="search-conditions" id="searchConditions">
                         <div class="search-conditions-grid">
                             <div class="search-field-group">
-                                <label class="search-field-label">ステータス</label>
-                                <select class="filter-select" id="statusFilter">
+                                <label class="search-field-label">ユーザー評価</label>
+                                <select class="filter-select" id="evaluationFilter">
                                     <option value="">すべて</option>
-                                    <option value="approved">公開済み</option>
-                                    <option value="pending">確認待ち</option>
-                                    <option value="rejected">取下げ</option>
+                                    <option value="good">Good</option>
+                                    <option value="bad">Bad</option>
+                                    <option value="none">未評価</option>
                                 </select>
                             </div>
                             
-                            <div class="search-field-group">
-                                <label class="search-field-label">カテゴリ</label>
-                                <select class="filter-select" id="categoryFilter">
-                                    <option value="">すべて</option>
-                                    <option value="1">システム関連</option>
-                                    <option value="2">ログイン・認証</option>
-                                    <option value="3">操作方法</option>
-                                    <option value="4">システム関連 > エラー対応</option>
-                                    <option value="5">システム関連 > 設定変更</option>
-                                    <option value="6">ログイン・認証 > パスワード関連</option>
-                                    <option value="7">ログイン・認証 > アカウント管理</option>
-                                </select>
-                            </div>
-                            
-                            <div class="search-field-group">
-                                <label class="search-field-label">生成元</label>
-                                <select class="filter-select" id="sourceFilter">
-                                    <option value="">すべて</option>
-                                    <option value="manual">手動作成</option>
-                                    <option value="ai">AI自動生成</option>
-                                    <option value="upload">ファイルアップロード</option>
-                                </select>
-                            </div>
                         </div>
                         
                         <div class="search-actions">
-                            <button class="btn btn-primary" onclick="searchFaqs()">検索</button>
+                            <button class="btn btn-primary" onclick="searchChatLogs()">検索</button>
                             <button class="btn btn-secondary" onclick="clearSearch()">クリア</button>
                         </div>
                     </div>
@@ -413,7 +464,7 @@
                 <!-- Table Section -->
                 <div class="table-section">
                     <div class="table-header">
-                        <div class="results-info" id="resultsInfo">127件該当 / 127件中1～20件目</div>
+                        <div class="results-info" id="resultsInfo">245件該当 / 245件中1～20件目</div>
                         <div class="table-actions">
                             <div class="table-controls">
                                 <select class="page-size-select" id="pageSize" onchange="changePageSize()">
@@ -422,7 +473,6 @@
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                            <button class="btn btn-success" onclick="window.location.href='faq-registration.html'">新規作成</button>
                         </div>
                     </div>
 
@@ -430,77 +480,69 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">FAQ ID</th>
-                                    <th style="width: 120px;">ステータス</th>
-                                    <th>質問</th>
-                                    <th>回答</th>
-                                    <th style="width: 150px;">カテゴリ</th>
-                                    <th style="width: 120px;">生成元</th>
-                                    <th style="width: 100px;">登録日</th>
-                                    <th style="width: 100px;">更新日</th>
-                                    <th style="width: 120px;">操作</th>
+                                    <th style="width: 80px;">会話ID</th>
+                                    <th>初回質問内容</th>
+                                    <th style="width: 80px;">評価</th>
+                                    <th style="width: 80px;">ターン数</th>
+                                    <th style="width: 140px;">開始日時</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=1" class="faq-id" style="text-decoration: none; cursor: pointer;">1</a></td>
-                                    <td><span class="status-badge approved">公開済み</span></td>
-                                    <td><div class="faq-question">AIチャットボットの使い方を教えてください</div></td>
-                                    <td><div class="faq-answer">AIチャットボットは画面右下のチャットアイコンをクリックして起動できます。質問を入力すると、AIが適切な回答を提供します...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
+                                    <td><a href="chat-log-detail.html?id=1" class="chat-id" style="text-decoration: none; cursor: pointer;">1</a></td>
+                                    <td><div class="chat-question">ログインパスワードを忘れてしまったのですが、どうすればよいですか？</div></td>
+                                    <td><span class="eval-badge good">Good</span></td>
+                                    <td><div class="turn-count">3</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">14:23</span></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=2" class="faq-id" style="text-decoration: none; cursor: pointer;">2</a></td>
-                                    <td><span class="status-badge approved">公開済み</span></td>
-                                    <td><div class="faq-question">パスワードをリセットする方法</div></td>
-                                    <td><div class="faq-answer">パスワードのリセットは、ログイン画面の「パスワードを忘れた方はこちら」リンクから行えます。登録されたメールアドレスにリセット用のリンクが送信されます...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
-                                    <td>2025-01-14</td>
-                                    <td>2025-01-14</td>
-                                    <td>-</td>
+                                    <td><a href="chat-log-detail.html?id=2" class="chat-id" style="text-decoration: none; cursor: pointer;">2</a></td>
+                                    <td><div class="chat-question">システムエラーが発生して画面が真っ白になってしまいます</div></td>
+                                    <td><span class="eval-badge bad">Bad</span></td>
+                                    <td><div class="turn-count">5</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">13:45</span></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=3" class="faq-id" style="text-decoration: none; cursor: pointer;">3</a></td>
-                                    <td><span class="status-badge pending">確認待ち</span></td>
-                                    <td><div class="faq-question">ダッシュボードの見方について</div></td>
-                                    <td><div class="faq-answer">ダッシュボードには、FAQ数の統計情報や最近のFAQ、確認待ちの項目が表示されます。左側のサイドバーから各機能にアクセスできます...</div></td>
-                                    <td><span class="category-tag">操作方法</span></td>
-                                    <td><span class="category-tag">ファイルアップロード</span></td>
-                                    <td>2025-01-15</td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn btn-success btn-small" onclick="approveFaq(3)">公開</button>
-                                            <button class="btn btn-delete btn-small" onclick="rejectFaq(3)">取下げ</button>
-                                        </div>
-                                    </td>
+                                    <td><a href="chat-log-detail.html?id=3" class="chat-id" style="text-decoration: none; cursor: pointer;">3</a></td>
+                                    <td><div class="chat-question">ダッシュボードの使い方を教えてください</div></td>
+                                    <td><span class="eval-badge good">Good</span></td>
+                                    <td><div class="turn-count">4</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">12:30</span></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=4" class="faq-id" style="text-decoration: none; cursor: pointer;">4</a></td>
-                                    <td><span class="status-badge approved">公開済み</span></td>
-                                    <td><div class="faq-question">システムエラーが発生した場合の対処法</div></td>
-                                    <td><div class="faq-answer">システムエラーが発生した場合は、まずブラウザをリフレッシュしてください。問題が解決しない場合は、ブラウザのキャッシュをクリアするか...</div></td>
-                                    <td><span class="category-tag">システム関連</span></td>
-                                    <td><span class="category-tag">手動作成</span></td>
-                                    <td>2025-01-13</td>
-                                    <td>2025-01-13</td>
-                                    <td>-</td>
+                                    <td><a href="chat-log-detail.html?id=4" class="chat-id" style="text-decoration: none; cursor: pointer;">4</a></td>
+                                    <td><div class="chat-question">新機能のアップデート情報はどこで確認できますか？</div></td>
+                                    <td><span class="eval-badge none">未評価</span></td>
+                                    <td><div class="turn-count">2</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">11:55</span></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="faq-detail-edit.html?id=5" class="faq-id" style="text-decoration: none; cursor: pointer;">5</a></td>
-                                    <td><span class="status-badge approved">公開済み</span></td>
-                                    <td><div class="faq-question">ログインができない場合の解決方法</div></td>
-                                    <td><div class="faq-answer">ログインができない場合は、以下の手順で確認してください。1. ユーザー名とパスワードが正しいか確認 2. Caps Lockがオンになっていないか確認...</div></td>
-                                    <td><span class="category-tag">ログイン・認証</span></td>
-                                    <td><span class="category-tag">AI自動生成</span></td>
-                                    <td>2025-01-12</td>
-                                    <td>2025-01-12</td>
-                                    <td>-</td>
+                                    <td><a href="chat-log-detail.html?id=5" class="chat-id" style="text-decoration: none; cursor: pointer;">5</a></td>
+                                    <td><div class="chat-question">アカウント設定を変更したいのですが手順を教えてください</div></td>
+                                    <td><span class="eval-badge good">Good</span></td>
+                                    <td><div class="turn-count">6</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">10:20</span></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="chat-log-detail.html?id=6" class="chat-id" style="text-decoration: none; cursor: pointer;">6</a></td>
+                                    <td><div class="chat-question">データのバックアップ方法について教えてください</div></td>
+                                    <td><span class="eval-badge none">未評価</span></td>
+                                    <td><div class="turn-count">7</div></td>
+                                    <td>2025-01-15<br><span style="font-size: 0.75rem; color: #64748b;">09:45</span></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="chat-log-detail.html?id=7" class="chat-id" style="text-decoration: none; cursor: pointer;">7</a></td>
+                                    <td><div class="chat-question">モバイルアプリでの操作方法を知りたいです</div></td>
+                                    <td><span class="eval-badge good">Good</span></td>
+                                    <td><div class="turn-count">4</div></td>
+                                    <td>2025-01-14<br><span style="font-size: 0.75rem; color: #64748b;">16:10</span></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="chat-log-detail.html?id=8" class="chat-id" style="text-decoration: none; cursor: pointer;">8</a></td>
+                                    <td><div class="chat-question">API連携の設定で困っています</div></td>
+                                    <td><span class="eval-badge bad">Bad</span></td>
+                                    <td><div class="turn-count">8</div></td>
+                                    <td>2025-01-14<br><span style="font-size: 0.75rem; color: #64748b;">15:30</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -508,12 +550,14 @@
 
                     <!-- Pagination -->
                     <div class="pagination">
-                        <div class="table-info">1-20 / 127件を表示</div>
+                        <div class="table-info">1-20 / 245件を表示</div>
                         <div class="pagination-controls">
                             <button class="pagination-button" disabled>← 前</button>
                             <button class="pagination-button active">1</button>
                             <button class="pagination-button">2</button>
                             <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
                             <button class="pagination-button">次 →</button>
                         </div>
                     </div>
@@ -524,9 +568,7 @@
 
     <script src="common/sidebar.js"></script>
     <script>
-        // FAQ管理画面固有の機能
-        let isEditMode = false;
-        let currentEditId = null;
+        // 会話ログ管理画面固有の機能
 
         // Search toggle functionality
         function toggleSearchConditions() {
@@ -538,24 +580,38 @@
         }
 
         // Search functions
-        function searchFaqs() {
+        function searchChatLogs() {
             const keyword = document.getElementById('searchKeyword').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
             const status = document.getElementById('statusFilter').value;
+            const evaluation = document.getElementById('evaluationFilter').value;
             const category = document.getElementById('categoryFilter').value;
-            const source = document.getElementById('sourceFilter').value;
+            const userId = document.getElementById('userIdFilter').value;
             
-            console.log('検索実行:', { keyword, status, category, source });
+            console.log('検索実行:', { 
+                keyword, 
+                dateFrom, 
+                dateTo, 
+                status, 
+                evaluation, 
+                category, 
+                userId 
+            });
             // Implement search logic here
             
             // Update results info
-            updateResultsInfo(127, 127, 1, 20);
+            updateResultsInfo(245, 245, 1, 20);
         }
 
         function clearSearch() {
             document.getElementById('searchKeyword').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
             document.getElementById('statusFilter').value = '';
+            document.getElementById('evaluationFilter').value = '';
             document.getElementById('categoryFilter').value = '';
-            document.getElementById('sourceFilter').value = '';
+            document.getElementById('userIdFilter').value = '';
             
             console.log('検索条件クリア');
             // Implement clear logic here
@@ -573,21 +629,52 @@
             // Implement page size change logic here
         }
 
-        // FAQ actions
-        function approveFaq(id) {
-            if (confirm('このFAQを公開しますか？')) {
-                console.log('FAQ公開:', id);
-                alert('FAQが公開されました');
-                location.reload();
+        // View chat detail
+        function viewChatDetail(chatId) {
+            console.log('会話詳細表示:', chatId);
+            window.location.href = `chat-log-detail.html?id=${chatId}`;
+        }
+
+        // Export chat logs
+        function exportChatLogs() {
+            console.log('CSVエクスポート実行');
+            
+            // 検索条件を取得
+            const keyword = document.getElementById('searchKeyword').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const status = document.getElementById('statusFilter').value;
+            const evaluation = document.getElementById('evaluationFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const userId = document.getElementById('userIdFilter').value;
+            
+            // 実際の実装では、これらの条件でサーバーにリクエストを送信
+            const exportParams = {
+                keyword,
+                dateFrom,
+                dateTo,
+                status,
+                evaluation,
+                category,
+                userId
+            };
+            
+            // サンプル: CSVダウンロードのシミュレーション
+            if (confirm('現在の検索条件で会話ログをCSVエクスポートしますか？')) {
+                alert('CSVエクスポートを開始します。完了後にダウンロードが開始されます。');
+                
+                // 実際の実装では、ここでダウンロード処理を実行
+                // window.location.href = `/api/chat-logs/export?${new URLSearchParams(exportParams)}`;
             }
         }
 
-        function rejectFaq(id) {
-            if (confirm('このFAQを取下げますか？')) {
-                console.log('FAQ取下げ:', id);
-                alert('FAQが取下げられました');
-                location.reload();
-            }
+        // Set default date range (last 7 days)
+        function setDefaultDateRange() {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+            document.getElementById('dateFrom').value = weekAgo.toISOString().split('T')[0];
         }
 
         // Pagination
@@ -598,6 +685,11 @@
                     // Implement pagination logic
                 }
             });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultDateRange();
         });
     </script>
 </body>

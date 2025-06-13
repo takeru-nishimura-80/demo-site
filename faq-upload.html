@@ -364,8 +364,8 @@
                     <div class="preview-header">
                         <h2 class="section-title">生成されたFAQ候補</h2>
                         <div>
-                            <button class="btn btn-primary" onclick="approveAllFaq()">すべて承認</button>
-                            <button class="btn btn-secondary" onclick="rejectAllFaq()">すべて拒否</button>
+                            <button class="btn btn-primary" onclick="approveAllFaq()">すべて公開</button>
+                            <button class="btn btn-secondary" onclick="rejectAllFaq()">すべて取下げ</button>
                         </div>
                     </div>
                     <div class="preview-content" id="previewContent">
@@ -536,8 +536,8 @@
                     <div class="faq-preview-question">${faq.question}</div>
                     <div class="faq-preview-answer">${faq.answer}</div>
                     <div class="faq-preview-actions">
-                        <button class="btn btn-approve btn-small" onclick="approveFaq(${faq.id})">承認</button>
-                        <button class="btn btn-reject btn-small" onclick="rejectFaq(${faq.id})">拒否</button>
+                        <button class="btn btn-approve btn-small" onclick="approveFaq(${faq.id})">公開</button>
+                        <button class="btn btn-reject btn-small" onclick="rejectFaq(${faq.id})">取下げ</button>
                         <span style="font-size: 0.75rem; color: #64748b; margin-left: 1rem;">生成元: ${faq.source}</span>
                     </div>
                 `;
@@ -547,9 +547,9 @@
 
         function approveFaq(id) {
             const faq = generatedFaqs.find(f => f.id === id);
-            if (faq && confirm(`「${faq.question}」を承認しますか？`)) {
-                console.log('FAQ承認:', faq);
-                showAlert('success', 'FAQが承認され、システムに登録されました');
+            if (faq && confirm(`「${faq.question}」を公開しますか？`)) {
+                console.log('FAQ公開:', faq);
+                showAlert('success', 'FAQが公開され、システムに登録されました');
                 
                 // Remove from preview
                 generatedFaqs = generatedFaqs.filter(f => f.id !== id);
@@ -565,9 +565,9 @@
 
         function rejectFaq(id) {
             const faq = generatedFaqs.find(f => f.id === id);
-            if (faq && confirm(`「${faq.question}」を拒否しますか？`)) {
-                console.log('FAQ拒否:', faq);
-                showAlert('warning', 'FAQが拒否されました');
+            if (faq && confirm(`「${faq.question}」を取下げますか？`)) {
+                console.log('FAQ取下げ:', faq);
+                showAlert('warning', 'FAQが取下げられました');
                 
                 // Remove from preview
                 generatedFaqs = generatedFaqs.filter(f => f.id !== id);
@@ -584,9 +584,9 @@
         function approveAllFaq() {
             if (generatedFaqs.length === 0) return;
             
-            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて承認しますか？`)) {
-                console.log('すべてのFAQ承認:', generatedFaqs);
-                showAlert('success', `${generatedFaqs.length}件のFAQが承認され、システムに登録されました`);
+            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて公開しますか？`)) {
+                console.log('すべてのFAQ公開:', generatedFaqs);
+                showAlert('success', `${generatedFaqs.length}件のFAQが公開され、システムに登録されました`);
                 
                 generatedFaqs = [];
                 document.getElementById('previewContainer').style.display = 'none';
@@ -597,9 +597,9 @@
         function rejectAllFaq() {
             if (generatedFaqs.length === 0) return;
             
-            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて拒否しますか？`)) {
-                console.log('すべてのFAQ拒否:', generatedFaqs);
-                showAlert('warning', `${generatedFaqs.length}件のFAQが拒否されました`);
+            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて取下げますか？`)) {
+                console.log('すべてのFAQ取下げ:', generatedFaqs);
+                showAlert('warning', `${generatedFaqs.length}件のFAQが取下げられました`);
                 
                 generatedFaqs = [];
                 document.getElementById('previewContainer').style.display = 'none';

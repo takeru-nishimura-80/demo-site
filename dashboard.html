@@ -10,7 +10,7 @@
         /* ダッシュボード固有のスタイル */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -66,64 +66,19 @@
         }
 
         .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .faq-list {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        .faq-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .faq-items {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .faq-item {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background 0.2s;
-        }
-
-        .faq-item:hover {
-            background: #f8fafc;
-        }
-
-        .faq-item:last-child {
-            border-bottom: none;
-        }
-
-        .faq-question {
-            font-weight: 500;
-            color: #1e293b;
-            margin-bottom: 0.25rem;
-        }
-
-        .faq-meta {
-            font-size: 0.75rem;
-            color: #64748b;
-            display: flex;
-            gap: 1rem;
+            justify-content: center;
         }
 
         .pending-approvals {
+            width: 100%;
+            max-width: 900px;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
+
 
         .pending-header {
             padding: 1.5rem;
@@ -144,16 +99,39 @@
             border-bottom: none;
         }
 
+        .pending-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
         .pending-title {
             font-size: 0.875rem;
             font-weight: 500;
             color: #1e293b;
-            margin-bottom: 0.5rem;
+            flex: 1;
+        }
+
+        .pending-title a {
+            color: #1e293b;
+            text-decoration: none;
+            display: block;
+            padding: 0.25rem 0;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .pending-title a:hover {
+            color: #3b82f6;
+            background-color: #f8fafc;
+            text-decoration: underline;
         }
 
         .pending-actions {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .btn-approve {
@@ -191,10 +169,6 @@
 
         /* レスポンシブ */
         @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -238,98 +212,88 @@
 
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">承認待ち</div>
+                            <div class="stat-title">確認待ちFAQ数</div>
                         </div>
                         <div class="stat-value">8</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Good数</div>
+                        </div>
+                        <div class="stat-value">342</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Bad数</div>
+                        </div>
+                        <div class="stat-value">23</div>
                     </div>
                 </div>
 
                 <!-- Content Grid -->
                 <div class="content-grid">
-                    <!-- FAQ List -->
-                    <div class="faq-list">
-                        <div class="faq-header">
-                            <h2 class="section-title">最近のFAQ</h2>
-                            <button class="btn btn-secondary" onclick="window.location.href='faq-management.html'">すべて表示</button>
-                        </div>
-                        <div class="faq-items">
-                            <div class="faq-item">
-                                <div class="faq-question">AIチャットボットの使い方を教えてください</div>
-                                <div class="faq-meta">
-                                    <span>作成日: 2025/01/15</span>
-                                </div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question">パスワードをリセットする方法</div>
-                                <div class="faq-meta">
-                                    <span>作成日: 2025/01/14</span>
-                                </div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question">システムエラーが発生した場合の対処法</div>
-                                <div class="faq-meta">
-                                    <span>作成日: 2025/01/13</span>
-                                </div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question">ログインができない場合の解決方法</div>
-                                <div class="faq-meta">
-                                    <span>作成日: 2025/01/12</span>
-                                </div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question">ファイルアップロードの制限について</div>
-                                <div class="faq-meta">
-                                    <span>作成日: 2025/01/11</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Pending Approvals -->
                     <div class="pending-approvals">
                         <div class="pending-header">
-                            <h2 class="section-title">承認待ちFAQ候補</h2>
+                            <h2 class="section-title">確認待ちFAQ候補</h2>
                         </div>
                         <div class="pending-items">
                             <div class="pending-item">
-                                <div class="pending-title">ダッシュボードの見方について</div>
+                                <div class="pending-title-row">
+                                    <div class="pending-title">
+                                        <a href="faq-detail-edit.html?id=1">ダッシュボードの見方について</a>
+                                    </div>
+                                    <div class="pending-actions">
+                                        <button class="btn btn-approve">公開</button>
+                                        <button class="btn btn-reject">取下げ</button>
+                                    </div>
+                                </div>
                                 <div class="faq-meta">
                                     <span>生成日: 2025/01/15</span>
                                 </div>
-                                <div class="pending-actions">
-                                    <button class="btn btn-approve btn-small">承認</button>
-                                    <button class="btn btn-reject btn-small">拒否</button>
-                                </div>
                             </div>
                             <div class="pending-item">
-                                <div class="pending-title">データエクスポート機能の使用方法</div>
+                                <div class="pending-title-row">
+                                    <div class="pending-title">
+                                        <a href="faq-detail-edit.html?id=2">データエクスポート機能の使用方法</a>
+                                    </div>
+                                    <div class="pending-actions">
+                                        <button class="btn btn-approve">公開</button>
+                                        <button class="btn btn-reject">取下げ</button>
+                                    </div>
+                                </div>
                                 <div class="faq-meta">
                                     <span>生成日: 2025/01/14</span>
                                 </div>
-                                <div class="pending-actions">
-                                    <button class="btn btn-approve btn-small">承認</button>
-                                    <button class="btn btn-reject btn-small">拒否</button>
-                                </div>
                             </div>
                             <div class="pending-item">
-                                <div class="pending-title">チャットログの確認方法</div>
+                                <div class="pending-title-row">
+                                    <div class="pending-title">
+                                        <a href="faq-detail-edit.html?id=3">チャットログの確認方法</a>
+                                    </div>
+                                    <div class="pending-actions">
+                                        <button class="btn btn-approve">公開</button>
+                                        <button class="btn btn-reject">取下げ</button>
+                                    </div>
+                                </div>
                                 <div class="faq-meta">
                                     <span>生成日: 2025/01/13</span>
                                 </div>
-                                <div class="pending-actions">
-                                    <button class="btn btn-approve btn-small">承認</button>
-                                    <button class="btn btn-reject btn-small">拒否</button>
-                                </div>
                             </div>
                             <div class="pending-item">
-                                <div class="pending-title">API設定の変更について</div>
+                                <div class="pending-title-row">
+                                    <div class="pending-title">
+                                        <a href="faq-detail-edit.html?id=4">API設定の変更について</a>
+                                    </div>
+                                    <div class="pending-actions">
+                                        <button class="btn btn-approve">公開</button>
+                                        <button class="btn btn-reject">取下げ</button>
+                                    </div>
+                                </div>
                                 <div class="faq-meta">
                                     <span>生成日: 2025/01/12</span>
-                                </div>
-                                <div class="pending-actions">
-                                    <button class="btn btn-approve btn-small">承認</button>
-                                    <button class="btn btn-reject btn-small">拒否</button>
                                 </div>
                             </div>
                         </div>
@@ -348,12 +312,6 @@
             });
         });
 
-        // FAQ item click
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.addEventListener('click', function() {
-                console.log('FAQ clicked:', this.querySelector('.faq-question').textContent);
-            });
-        });
     </script>
 </body>
 </html>
