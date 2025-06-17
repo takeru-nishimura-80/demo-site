@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR AI Chatbot</title>
+    <link rel="stylesheet" href="chatbot.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <span class="chatbot-icon">🧑‍💻</span>
+                    <span>HR AI Chatbot</span>
+                </div>
+                
+                <!-- タブ切り替え -->
+                <div class="tab-container">
+                    <button class="tab-btn active" data-tab="notion">
+                        <span class="tab-icon">📝</span>
+                        <span>ドキュメント</span>
+                    </button>
+                    <button class="tab-btn" data-tab="faq">
+                        <span class="tab-icon">❓</span>
+                        <span>FAQ</span>
+                    </button>
+                </div>
+                
+                <!-- データソース表示 -->
+                <div class="data-source-info">
+                    <span class="source-label">データソース:</span>
+                    <span class="source-name" id="sourceDisplay">ドキュメント</span>
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <button class="new-chat-btn">
+                    <span class="btn-icon">+</span>
+                    新規チャット
+                </button>
+                
+                <!-- Powered by Dify をサイドバー内に移動 -->
+                <div class="sidebar-footer">
+                    <div class="powered-by">
+                        <span>Powered by</span>
+                        <strong>Dify</strong>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-chat">
+            <!-- 初期状態の表示 -->
+            <div class="welcome-container" id="welcomeContainer">
+                <div class="welcome-avatar">🧑‍💻</div>
+                <div class="welcome-message">人事制度に関してなんでも聞いてね</div>
+            </div>
+
+            <!-- チャットエリア（初期は非表示） -->
+            <div class="chat-container" id="chatContainer" style="display: none;">
+                <div class="chat-messages" id="chatMessages">
+                </div>
+
+                <!-- タイピングインジケーター -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 応答を停止ボタン -->
+            <div class="stop-response-area" id="stopResponseArea" style="display: none;">
+                <button class="stop-response-btn" id="stopResponseBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    </svg>
+                    応答を停止
+                </button>
+            </div>
+
+            <!-- 入力エリア -->
+            <div class="chat-input-area">
+                <div class="chat-input-container">
+                    <input
+                        type="text"
+                        class="chat-input"
+                        id="messageInput"
+                        placeholder="ボットと話す" />
+                    <button class="send-button" id="sendButton">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12h18m-9-9l9 9-9 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <script src="chatbot.js"></script>
+</body>
+</html>
