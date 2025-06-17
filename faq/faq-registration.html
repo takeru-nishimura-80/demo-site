@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ管理システム - FAQ新規登録</title>
+    <link rel="stylesheet" href="common/common.css">
+    <link rel="stylesheet" href="common/sidebar.css">
+    <style>
+        /* FAQ新規登録画面固有のスタイル */
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        .required-badge {
+            background: #6366f1;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #a1a1aa;
+        }
+
+        .form-textarea {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 150px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            background-color: #ffffff;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea::placeholder {
+            color: #a1a1aa;
+        }
+
+        .form-textarea.small {
+            min-height: 100px;
+        }
+
+        /* Button Section */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-large {
+            height: 3rem;
+            padding: 0 2rem;
+            font-size: 1rem;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .form-input,
+            .form-textarea {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- サイドバーの内容はJavaScriptで動的に生成されます -->
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="page-breadcrumb">新規登録</div>
+                        <div class="user-info">
+                            <span>管理者</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container main-content">
+                <h1 class="page-title">FAQ新規登録</h1>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <form id="registrationForm">
+                        <div class="form-group">
+                            <label class="form-label">
+                                質問
+                                <span class="required-badge">必須</span>
+                            </label>
+                            <textarea
+                                class="form-textarea small"
+                                id="question"
+                                placeholder="FAQ の質問内容を入力してください"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                回答
+                                <span class="required-badge">必須</span>
+                            </label>
+                            <textarea
+                                class="form-textarea"
+                                id="answer"
+                                placeholder="FAQ の回答内容を入力してください"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                カテゴリ
+                            </label>
+                            <select class="form-input" id="category">
+                                <option value="">選択してください</option>
+                                <option value="1">システム関連</option>
+                                <option value="2">ログイン・認証</option>
+                                <option value="3">操作方法</option>
+                                <option value="4">システム関連 > エラー対応</option>
+                                <option value="5">システム関連 > 設定変更</option>
+                                <option value="6">ログイン・認証 > パスワード関連</option>
+                                <option value="7">ログイン・認証 > アカウント管理</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                生成元
+                                <span class="required-badge">必須</span>
+                            </label>
+                            <select class="form-input" id="source" required>
+                                <option value="">選択してください</option>
+                                <option value="manual">手動作成</option>
+                                <option value="ai">AI自動生成</option>
+                                <option value="upload">ファイルアップロード</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                ステータス
+                                <span class="required-badge">必須</span>
+                            </label>
+                            <select class="form-input" id="status" required>
+                                <option value="">選択してください</option>
+                                <option value="approved">公開済み</option>
+                                <option value="pending" selected>確認待ち</option>
+                                <option value="rejected">取下げ</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary btn-large" onclick="goBack()">
+                                一覧に戻る
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-large">
+                                保存
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="common/sidebar.js"></script>
+    <script>
+        // FAQ新規登録画面固有の機能
+        
+        // Form submission handling
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const question = document.getElementById('question').value;
+            const answer = document.getElementById('answer').value;
+            const category = document.getElementById('category').value;
+            const source = document.getElementById('source').value;
+            const status = document.getElementById('status').value;
+            
+            // Validation
+            if (!question.trim()) {
+                alert('質問を入力してください');
+                return;
+            }
+            
+            if (!answer.trim()) {
+                alert('回答を入力してください');
+                return;
+            }
+            
+            if (!source) {
+                alert('生成元を選択してください');
+                return;
+            }
+            
+            if (!status) {
+                alert('ステータスを選択してください');
+                return;
+            }
+            
+            // Simulate save operation
+            console.log('保存データ:', {
+                question: question.trim(),
+                answer: answer.trim(),
+                category: category,
+                source: source,
+                status: status
+            });
+            
+            if (confirm('FAQを保存しますか？')) {
+                alert('FAQが正常に保存されました');
+                // Redirect to list page or clear form
+                clearForm();
+            }
+        });
+
+        // Go back function
+        function goBack() {
+            if (confirm('入力内容が失われますが、一覧に戻りますか？')) {
+                window.location.href = 'faq-management.html';
+            }
+        }
+
+        // Clear form function
+        function clearForm() {
+            document.getElementById('question').value = '';
+            document.getElementById('answer').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('source').value = '';
+            document.getElementById('status').value = 'pending';
+        }
+
+        // Auto-resize textareas
+        const textareas = document.querySelectorAll('.form-textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                const minHeight = this.classList.contains('small') ? 100 : 150;
+                this.style.height = Math.max(minHeight, this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>

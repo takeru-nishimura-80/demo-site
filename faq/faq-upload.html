@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ管理システム - FAQアップロード</title>
+    <link rel="stylesheet" href="common/common.css">
+    <link rel="stylesheet" href="common/sidebar.css">
+    <style>
+        /* FAQアップロード画面固有のスタイル */
+        .upload-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .upload-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .upload-area {
+            padding: 2rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+
+        .upload-zone:hover {
+            border-color: #6366f1;
+            background: #f8fafc;
+        }
+
+        .upload-zone.dragover {
+            border-color: #6366f1;
+            background: #f0f9ff;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            height: 2.5rem;
+            padding: 0 1rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 0.5rem;
+            background: #0f172a;
+            color: #f8fafc;
+            border-color: #0f172a;
+        }
+
+        .upload-button:hover {
+            background: #334155;
+            border-color: #334155;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* File Restrictions */
+        .file-restrictions {
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .restrictions-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .restrictions-list {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 0;
+            padding-left: 1rem;
+        }
+
+        .restrictions-list li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Upload Progress */
+        .upload-progress {
+            display: none;
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-info {
+            flex: 1;
+        }
+
+        .progress-filename {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 0.5rem;
+            background: #e2e8f0;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #6366f1;
+            transition: width 0.3s;
+        }
+
+        .progress-status {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .progress-status.success {
+            color: #10b981;
+        }
+
+        .progress-status.error {
+            color: #ef4444;
+        }
+
+        /* Generated FAQ Preview */
+        .preview-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .preview-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .faq-preview-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .faq-preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-preview-question {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-preview-answer {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .faq-preview-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert.success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .alert.warning {
+            background: #fef3c7;
+            border: 1px solid #fed7aa;
+            color: #92400e;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- サイドバーの内容はJavaScriptで動的に生成されます -->
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="page-breadcrumb"></div>
+                        <div class="user-info">
+                            <span>管理者</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container main-content">
+                <h1 class="page-title">FAQアップロード</h1>
+                <p class="page-subtitle">ドキュメントファイルからFAQ候補を自動生成します</p>
+
+                <!-- Success/Error Messages -->
+                <div id="alertContainer"></div>
+
+                <!-- Upload Container -->
+                <div class="upload-container">
+                    <div class="upload-header">
+                        <h2 class="section-title">ファイルアップロード</h2>
+                        <p class="section-description">対応ファイル形式: .txt, .md, .zip, .docx, .pdf (最大5MB)</p>
+                    </div>
+                    
+                    <div class="upload-area">
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-icon">📁</div>
+                            <div class="upload-text">ファイルをドラッグ&ドロップ</div>
+                            <div class="upload-subtext">または、下のボタンをクリックしてファイルを選択してください</div>
+                            <button type="button" class="upload-button" onclick="document.getElementById('fileInput').click()">
+                                <span>📎</span>
+                                ファイルを選択
+                            </button>
+                            <input type="file" id="fileInput" class="file-input" accept=".txt,.md,.zip,.docx,.pdf" multiple>
+                        </div>
+                    </div>
+
+                    <div class="file-restrictions">
+                        <div class="restrictions-title">ファイル制限事項</div>
+                        <ul class="restrictions-list">
+                            <li>対応ファイル形式: .txt, .md, .zip, .docx, .pdf</li>
+                            <li>ファイルサイズ上限: 5MB</li>
+                            <li>同時アップロード数: 1ファイル</li>
+                            <li>zipファイルは展開されて処理されます</li>
+                        </ul>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <!-- Progress items will be inserted here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Generated FAQ Preview -->
+                <div class="preview-container" id="previewContainer">
+                    <div class="preview-header">
+                        <h2 class="section-title">生成されたFAQ候補</h2>
+                        <div>
+                            <button class="btn btn-primary" onclick="approveAllFaq()">すべて公開</button>
+                            <button class="btn btn-secondary" onclick="rejectAllFaq()">すべて取下げ</button>
+                        </div>
+                    </div>
+                    <div class="preview-content" id="previewContent">
+                        <!-- FAQ previews will be inserted here dynamically -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="common/sidebar.js"></script>
+    <script>
+        // FAQアップロード画面固有の機能
+        let uploadedFiles = [];
+        let generatedFaqs = [];
+
+        // File upload handling
+        function initializeUpload() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Drag and drop events
+            uploadZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+
+            uploadZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+            });
+
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            // File input change
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            const allowedTypes = ['.txt', '.md', '.zip', '.docx', '.pdf'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            for (let file of files) {
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!allowedTypes.includes(fileExtension)) {
+                    showAlert('error', `サポートされていないファイル形式です: ${file.name}`);
+                    continue;
+                }
+
+                if (file.size > maxSize) {
+                    showAlert('error', `ファイルサイズが上限を超えています (${file.name}): ${(file.size / 1024 / 1024).toFixed(2)}MB > 5MB`);
+                    continue;
+                }
+
+                // Process single file at a time
+                if (uploadedFiles.length > 0) {
+                    showAlert('warning', '同時アップロードは1ファイルまでです。前のファイルの処理が完了してから再度お試しください。');
+                    break;
+                }
+
+                uploadFile(file);
+                break; // Process only one file
+            }
+        }
+
+        function uploadFile(file) {
+            uploadedFiles.push(file);
+            
+            const progressContainer = document.getElementById('uploadProgress');
+            progressContainer.style.display = 'block';
+            
+            const progressItem = createProgressItem(file);
+            progressContainer.appendChild(progressItem);
+
+            // Simulate upload progress
+            simulateUpload(file, progressItem);
+        }
+
+        function createProgressItem(file) {
+            const item = document.createElement('div');
+            item.className = 'progress-item';
+            item.innerHTML = `
+                <div class="progress-info">
+                    <div class="progress-filename">${file.name}</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-status">アップロード中...</div>
+                </div>
+            `;
+            return item;
+        }
+
+        function simulateUpload(file, progressItem) {
+            const progressBar = progressItem.querySelector('.progress-bar');
+            const statusElement = progressItem.querySelector('.progress-status');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    progressBar.style.width = '100%';
+                    statusElement.textContent = 'FAQ生成中...';
+                    statusElement.className = 'progress-status';
+                    
+                    // Simulate FAQ generation
+                    setTimeout(() => {
+                        generateFaqPreview(file);
+                        statusElement.textContent = '完了';
+                        statusElement.className = 'progress-status success';
+                        showAlert('success', `${file.name} のアップロードとFAQ生成が完了しました`);
+                    }, 2000);
+                } else {
+                    progressBar.style.width = progress + '%';
+                }
+            }, 200);
+        }
+
+        function generateFaqPreview(file) {
+            // Mock FAQ generation based on file type
+            const mockFaqs = [
+                {
+                    id: Date.now() + 1,
+                    question: `${file.name}のファイルに関する基本的な使い方を教えてください`,
+                    answer: `${file.name}は、システムで利用可能なドキュメントファイルです。このファイルには重要な情報が含まれており、適切に活用することでワークフローを改善できます。`,
+                    source: file.name
+                },
+                {
+                    id: Date.now() + 2,
+                    question: `${file.name}のドキュメントで注意すべき点はありますか？`,
+                    answer: `${file.name}のドキュメントを使用する際は、最新バージョンであることを確認し、記載されているガイドラインに従って処理してください。不明な点がある場合は管理者にお問い合わせください。`,
+                    source: file.name
+                },
+                {
+                    id: Date.now() + 3,
+                    question: `${file.name}のファイル形式について説明してください`,
+                    answer: `${file.name}は${file.name.split('.').pop().toUpperCase()}形式のファイルです。この形式は一般的にドキュメント管理や情報共有に使用され、多くのアプリケーションで開くことができます。`,
+                    source: file.name
+                }
+            ];
+
+            generatedFaqs = [...generatedFaqs, ...mockFaqs];
+            displayFaqPreview();
+        }
+
+        function displayFaqPreview() {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewContent = document.getElementById('previewContent');
+            
+            previewContainer.style.display = 'block';
+            previewContent.innerHTML = '';
+
+            generatedFaqs.forEach(faq => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'faq-preview-item';
+                faqItem.innerHTML = `
+                    <div class="faq-preview-question">${faq.question}</div>
+                    <div class="faq-preview-answer">${faq.answer}</div>
+                    <div class="faq-preview-actions">
+                        <button class="btn btn-approve btn-small" onclick="approveFaq(${faq.id})">公開</button>
+                        <button class="btn btn-reject btn-small" onclick="rejectFaq(${faq.id})">取下げ</button>
+                        <span style="font-size: 0.75rem; color: #64748b; margin-left: 1rem;">生成元: ${faq.source}</span>
+                    </div>
+                `;
+                previewContent.appendChild(faqItem);
+            });
+        }
+
+        function approveFaq(id) {
+            const faq = generatedFaqs.find(f => f.id === id);
+            if (faq && confirm(`「${faq.question}」を公開しますか？`)) {
+                console.log('FAQ公開:', faq);
+                showAlert('success', 'FAQが公開され、システムに登録されました');
+                
+                // Remove from preview
+                generatedFaqs = generatedFaqs.filter(f => f.id !== id);
+                displayFaqPreview();
+                
+                // Hide preview if no FAQs left
+                if (generatedFaqs.length === 0) {
+                    document.getElementById('previewContainer').style.display = 'none';
+                    resetUpload();
+                }
+            }
+        }
+
+        function rejectFaq(id) {
+            const faq = generatedFaqs.find(f => f.id === id);
+            if (faq && confirm(`「${faq.question}」を取下げますか？`)) {
+                console.log('FAQ取下げ:', faq);
+                showAlert('warning', 'FAQが取下げられました');
+                
+                // Remove from preview
+                generatedFaqs = generatedFaqs.filter(f => f.id !== id);
+                displayFaqPreview();
+                
+                // Hide preview if no FAQs left
+                if (generatedFaqs.length === 0) {
+                    document.getElementById('previewContainer').style.display = 'none';
+                    resetUpload();
+                }
+            }
+        }
+
+        function approveAllFaq() {
+            if (generatedFaqs.length === 0) return;
+            
+            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて公開しますか？`)) {
+                console.log('すべてのFAQ公開:', generatedFaqs);
+                showAlert('success', `${generatedFaqs.length}件のFAQが公開され、システムに登録されました`);
+                
+                generatedFaqs = [];
+                document.getElementById('previewContainer').style.display = 'none';
+                resetUpload();
+            }
+        }
+
+        function rejectAllFaq() {
+            if (generatedFaqs.length === 0) return;
+            
+            if (confirm(`${generatedFaqs.length}件のFAQ候補をすべて取下げますか？`)) {
+                console.log('すべてのFAQ取下げ:', generatedFaqs);
+                showAlert('warning', `${generatedFaqs.length}件のFAQが取下げられました`);
+                
+                generatedFaqs = [];
+                document.getElementById('previewContainer').style.display = 'none';
+                resetUpload();
+            }
+        }
+
+        function resetUpload() {
+            uploadedFiles = [];
+            document.getElementById('uploadProgress').style.display = 'none';
+            document.getElementById('uploadProgress').innerHTML = '';
+            document.getElementById('fileInput').value = '';
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            alert.innerHTML = `
+                <span>${icon}</span>
+                <span>${message}</span>
+            `;
+            
+            alertContainer.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+
+        // Initialize upload functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUpload();
+        });
+    </script>
+</body>
+</html>

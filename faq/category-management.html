@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ管理システム - カテゴリ管理</title>
+    <link rel="stylesheet" href="common/common.css">
+    <link rel="stylesheet" href="common/sidebar.css">
+    <style>
+        /* カテゴリ管理画面固有のスタイル */
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-main {
+            padding: 1rem 1.5rem;
+        }
+
+        .search-field-group {
+            margin-bottom: 1rem;
+        }
+
+        .search-field-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-conditions {
+            display: none;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+        }
+
+        .search-conditions.expanded {
+            display: block;
+        }
+
+        .search-conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .search-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+        }
+
+        .search-toggle:hover {
+            color: #5338e8;
+        }
+
+        .search-toggle-icon {
+            transition: transform 0.2s;
+        }
+
+        .search-toggle.expanded .search-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background: white;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-info {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .results-info {
+            font-size: 0.875rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .page-size-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            background: white;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            font-size: 0.875rem;
+            color: #1f2937;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .category-id {
+            color: #6366f1;
+            font-weight: 500;
+        }
+
+        .category-name {
+            font-weight: 500;
+        }
+
+        .category-hierarchy {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hierarchy-level {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .hierarchy-level.level-1 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .hierarchy-level.level-2 {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .hierarchy-level.level-3 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .parent-category {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .display-order {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 0.25rem;
+        }
+
+        .status-badge.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .pagination-button {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #374151;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-button.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .table-actions {
+                justify-content: space-between;
+            }
+
+            .data-table {
+                font-size: 0.75rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-conditions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- サイドバーの内容はJavaScriptで動的に生成されます -->
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="page-breadcrumb"></div>
+                        <div class="user-info">
+                            <span>管理者</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container main-content">
+                <h1 class="page-title">カテゴリ管理</h1>
+
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-header">
+                        <div class="search-main">
+                            <div class="search-field-group">
+                                <label class="search-field-label">カテゴリID・カテゴリ名検索</label>
+                                <input type="text" class="search-input" placeholder="カテゴリID・カテゴリ名を入力してください" id="searchKeyword">
+                            </div>
+                            
+                            <button class="search-toggle" id="searchToggle" onclick="toggleSearchConditions()">
+                                <span class="search-toggle-icon">▼</span>
+                                検索条件
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-conditions" id="searchConditions">
+                        <div class="search-conditions-grid">
+                            <div class="search-field-group">
+                                <label class="search-field-label">ステータス</label>
+                                <select class="filter-select" id="statusFilter">
+                                    <option value="">すべて</option>
+                                    <option value="active">有効</option>
+                                    <option value="inactive">停止中</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="search-actions">
+                            <button class="btn btn-primary" onclick="searchCategories()">検索</button>
+                            <button class="btn btn-secondary" onclick="clearSearch()">クリア</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="table-section">
+                    <div class="table-header">
+                        <div class="results-info" id="resultsInfo">12件該当 / 12件中1～12件目</div>
+                        <div class="table-actions">
+                            <div class="table-controls">
+                                <select class="page-size-select" id="pageSize" onchange="changePageSize()">
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success" onclick="window.location.href='category-registration.html'">新規作成</button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th style="width: 120px;">ステータス</th>
+                                    <th>カテゴリ名</th>
+                                    <th style="width: 150px;">親カテゴリ</th>
+                                    <th style="width: 80px;">表示順</th>
+                                    <th style="width: 100px;">作成日</th>
+                                    <th style="width: 100px;">更新日</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=1" class="category-id" style="text-decoration: none; cursor: pointer;">1</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">システム関連</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=2" class="category-id" style="text-decoration: none; cursor: pointer;">2</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">ログイン・認証</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=3" class="category-id" style="text-decoration: none; cursor: pointer;">3</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">操作方法</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">3</div></td>
+                                    <td>2025-01-10</td>
+                                    <td>2025-01-10</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=4" class="category-id" style="text-decoration: none; cursor: pointer;">4</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">エラー対応</div></td>
+                                    <td><span class="parent-category">システム関連</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=5" class="category-id" style="text-decoration: none; cursor: pointer;">5</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">設定変更</div></td>
+                                    <td><span class="parent-category">システム関連</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=6" class="category-id" style="text-decoration: none; cursor: pointer;">6</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワード関連</div></td>
+                                    <td><span class="parent-category">ログイン・認証</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=7" class="category-id" style="text-decoration: none; cursor: pointer;">7</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">アカウント管理</div></td>
+                                    <td><span class="parent-category">ログイン・認証</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-11</td>
+                                    <td>2025-01-11</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=8" class="category-id" style="text-decoration: none; cursor: pointer;">8</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワードリセット</div></td>
+                                    <td><span class="parent-category">パスワード関連</span></td>
+                                    <td><div class="display-order">1</div></td>
+                                    <td>2025-01-12</td>
+                                    <td>2025-01-12</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=9" class="category-id" style="text-decoration: none; cursor: pointer;">9</a></td>
+                                    <td><span class="status-badge active">有効</span></td>
+                                    <td><div class="category-name">パスワード変更</div></td>
+                                    <td><span class="parent-category">パスワード関連</span></td>
+                                    <td><div class="display-order">2</div></td>
+                                    <td>2025-01-12</td>
+                                    <td>2025-01-12</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="category-detail-edit.html?id=10" class="category-id" style="text-decoration: none; cursor: pointer;">10</a></td>
+                                    <td><span class="status-badge inactive">停止中</span></td>
+                                    <td><div class="category-name">旧カテゴリ</div></td>
+                                    <td><span class="parent-category">-</span></td>
+                                    <td><div class="display-order">999</div></td>
+                                    <td>2025-01-05</td>
+                                    <td>2025-01-15</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="table-info">1-10 / 12件を表示</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>← 前</button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button" disabled>次 →</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="common/sidebar.js"></script>
+    <script>
+        // カテゴリ管理画面固有の機能
+
+        // Search toggle functionality
+        function toggleSearchConditions() {
+            const conditions = document.getElementById('searchConditions');
+            const toggle = document.getElementById('searchToggle');
+            
+            conditions.classList.toggle('expanded');
+            toggle.classList.toggle('expanded');
+        }
+
+        // Search functions
+        function searchCategories() {
+            const keyword = document.getElementById('searchKeyword').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            console.log('検索実行:', { keyword, status });
+            // Implement search logic here
+            
+            // Update results info
+            updateResultsInfo(12, 12, 1, 10);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchKeyword').value = '';
+            document.getElementById('statusFilter').value = '';
+            
+            console.log('検索条件クリア');
+            // Implement clear logic here
+        }
+
+        function updateResultsInfo(total, filtered, start, end) {
+            document.getElementById('resultsInfo').textContent = 
+                `${filtered}件該当 / ${total}件中${start}～${end}件目`;
+        }
+
+        // Page size change
+        function changePageSize() {
+            const pageSize = document.getElementById('pageSize').value;
+            console.log('表示件数変更:', pageSize);
+            // Implement page size change logic here
+        }
+
+        // Pagination
+        document.querySelectorAll('.pagination-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('active')) {
+                    console.log('ページ変更:', this.textContent.trim());
+                    // Implement pagination logic
+                }
+            });
+        });
+    </script>
+</body>
+</html>

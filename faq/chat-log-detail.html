@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ管理システム - 会話ログ詳細</title>
+    <link rel="stylesheet" href="common/common.css">
+    <link rel="stylesheet" href="common/sidebar.css">
+    <style>
+        /* 会話ログ詳細画面固有のスタイル */
+        .container {
+            max-width: 1400px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafc;
+            color: #374151;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: #f1f5f9;
+            border-color: #9ca3af;
+        }
+
+        /* Basic Info Section */
+        .basic-info-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Evaluation Badge */
+        .eval-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .eval-badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .eval-badge.bad {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .eval-badge.none {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Chat History Section */
+        .chat-history-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .chat-history {
+            padding: 1rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .chat-turn {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #f1f5f9;
+            border-radius: 0.5rem;
+            background: #fafafa;
+        }
+
+        .turn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .turn-number {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .turn-timestamp {
+            font-size: 0.8125rem;
+        }
+
+        .message {
+            margin-bottom: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .user-message {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .bot-message {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+
+        .message-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .message-content {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #1f2937;
+            white-space: pre-wrap;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-generate-faq {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .btn-generate-faq:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .btn-edit-evaluation {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        .btn-edit-evaluation:hover {
+            background: #d97706;
+            border-color: #d97706;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- サイドバーの内容はJavaScriptで動的に生成されます -->
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="page-breadcrumb">会話ログ管理 / 詳細</div>
+                        <div class="user-info">
+                            <span>管理者</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container main-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">会話ログ詳細</h1>
+                        <p class="page-description">チャットボットとユーザーの会話内容を確認できます</p>
+                    </div>
+                    <a href="chat-log-management.html" class="back-button">
+                        ← 一覧に戻る
+                    </a>
+                </div>
+                    <!-- Basic Information -->
+                    <div class="basic-info-section">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">会話ID</div>
+                                <div class="info-value" id="chatId">1</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">開始日時</div>
+                                <div class="info-value" id="startTime">2025-01-15 14:23</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">終了日時</div>
+                                <div class="info-value" id="endTime">2025-01-15 14:25</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">ターン数</div>
+                                <div class="info-value" id="turnCount">3</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">ユーザー評価</div>
+                                <div class="info-value" id="userEvaluationSummary">
+                                    <span class="eval-badge good">Good 2個</span>
+                                    <span class="eval-badge bad">Bad 1個</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat History -->
+                    <div class="chat-history-section">
+                        <div class="section-header">
+                            会話履歴
+                        </div>
+                        <div class="chat-history" id="chatHistory">
+                            <!-- Turn 1 -->
+                            <div class="chat-turn">
+                                <div class="turn-header">
+                                    <span class="turn-number">ターン 1</span>
+                                    <span class="turn-timestamp">2025-01-15 14:23:15</span>
+                                </div>
+                                <div class="message user-message">
+                                    <div class="message-label">ユーザー</div>
+                                    <div class="message-content">ログインパスワードを忘れてしまったのですが、どうすればよいですか？</div>
+                                </div>
+                                <div class="message bot-message">
+                                    <div class="message-label">チャットボット</div>
+                                    <div class="message-content">ログインパスワードをお忘れの場合は、以下の手順でパスワードリセットを行ってください。
+
+1. ログイン画面の「パスワードを忘れた方はこちら」をクリック
+2. ご登録のメールアドレスを入力
+3. 送信されたメールのリンクをクリック
+4. 新しいパスワードを設定
+
+メールが届かない場合は、迷惑メールフォルダもご確認ください。それでも解決しない場合は、サポートセンターまでお問い合わせください。</div>
+                                </div>
+                                <div class="turn-evaluation">
+                                    <span class="info-label">このターンの評価:</span>
+                                    <span class="eval-badge good">Good</span>
+                                </div>
+                            </div>
+
+                            <!-- Turn 2 -->
+                            <div class="chat-turn">
+                                <div class="turn-header">
+                                    <span class="turn-number">ターン 2</span>
+                                    <span class="turn-timestamp">2025-01-15 14:24:32</span>
+                                </div>
+                                <div class="message user-message">
+                                    <div class="message-label">ユーザー</div>
+                                    <div class="message-content">メールアドレスは登録時と変わっているかもしれません。その場合はどうすればよいですか？</div>
+                                </div>
+                                <div class="message bot-message">
+                                    <div class="message-label">チャットボット</div>
+                                    <div class="message-content">登録メールアドレスが変更されている場合は、以下の方法でサポートセンターにお問い合わせください。
+
+【お問い合わせ方法】
+- 電話：0120-XXX-XXX（平日9:00-18:00）
+- メール：support@example.com
+
+お問い合わせの際は、以下の情報をお教えください：
+- お名前
+- 旧メールアドレス（覚えている範囲で）
+- アカウント作成時期
+- 本人確認のための情報
+
+サポートスタッフが本人確認後、メールアドレスの変更とパスワードリセットを行います。</div>
+                                </div>
+                                <div class="turn-evaluation">
+                                    <span class="info-label">このターンの評価:</span>
+                                    <span class="eval-badge good">Good</span>
+                                </div>
+                            </div>
+
+                            <!-- Turn 3 -->
+                            <div class="chat-turn">
+                                <div class="turn-header">
+                                    <span class="turn-number">ターン 3</span>
+                                    <span class="turn-timestamp">2025-01-15 14:25:10</span>
+                                </div>
+                                <div class="message user-message">
+                                    <div class="message-label">ユーザー</div>
+                                    <div class="message-content">ありがとうございます。サポートセンターに連絡してみます。</div>
+                                </div>
+                                <div class="message bot-message">
+                                    <div class="message-label">チャットボット</div>
+                                    <div class="message-content">お役に立てて良かったです。サポートセンターがお客様のお困りごとを解決いたします。
+
+何か他にご不明な点がございましたら、いつでもお気軽にお声かけください。
+
+今回のサポートはいかがでしたか？よろしければ評価をお聞かせください。</div>
+                                </div>
+                                <div class="turn-evaluation">
+                                    <span class="info-label">このターンの評価:</span>
+                                    <span class="eval-badge bad">Bad</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+        </div>
+    </div>
+
+    <script src="common/sidebar.js"></script>
+    <script>
+        // 会話ログ詳細画面固有の機能
+
+        // URLパラメータから会話IDを取得
+        function getChatIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || '1';
+        }
+
+        // 会話データを読み込み
+        function loadChatData(chatId) {
+            // 実際の実装では、APIからデータを取得
+            const sampleData = {
+                '1': {
+                    id: '1',
+                    startTime: '2025-01-15 14:23',
+                    endTime: '2025-01-15 14:25',
+                    turnCount: 3,
+                    evaluationSummary: { good: 2, bad: 1 },
+                    turns: [
+                        {
+                            turnNumber: 1,
+                            timestamp: '2025-01-15 14:23:15',
+                            userMessage: 'ログインパスワードを忘れてしまったのですが、どうすればよいですか？',
+                            botMessage: 'ログインパスワードをお忘れの場合は、以下の手順でパスワードリセットを行ってください。\n\n1. ログイン画面の「パスワードを忘れた方はこちら」をクリック\n2. ご登録のメールアドレスを入力\n3. 送信されたメールのリンクをクリック\n4. 新しいパスワードを設定\n\nメールが届かない場合は、迷惑メールフォルダもご確認ください。それでも解決しない場合は、サポートセンターまでお問い合わせください。',
+                            evaluation: 'good'
+                        },
+                        {
+                            turnNumber: 2,
+                            timestamp: '2025-01-15 14:24:32',
+                            userMessage: 'メールアドレスは登録時と変わっているかもしれません。その場合はどうすればよいですか？',
+                            botMessage: '登録メールアドレスが変更されている場合は、以下の方法でサポートセンターにお問い合わせください。\n\n【お問い合わせ方法】\n- 電話：0120-XXX-XXX（平日9:00-18:00）\n- メール：support@example.com\n\nお問い合わせの際は、以下の情報をお教えください：\n- お名前\n- 旧メールアドレス（覚えている範囲で）\n- アカウント作成時期\n- 本人確認のための情報\n\nサポートスタッフが本人確認後、メールアドレスの変更とパスワードリセットを行います。',
+                            evaluation: 'good'
+                        },
+                        {
+                            turnNumber: 3,
+                            timestamp: '2025-01-15 14:25:10',
+                            userMessage: 'ありがとうございます。サポートセンターに連絡してみます。',
+                            botMessage: 'お役に立てて良かったです。サポートセンターがお客様のお困りごとを解決いたします。\n\n何か他にご不明な点がございましたら、いつでもお気軽にお声かけください。\n\n今回のサポートはいかがでしたか？よろしければ評価をお聞かせください。',
+                            evaluation: 'bad'
+                        }
+                    ]
+                },
+                '2': {
+                    id: '2',
+                    startTime: '2025-01-15 13:45',
+                    endTime: '2025-01-15 13:53',
+                    turnCount: 5,
+                    evaluationSummary: { good: 1, bad: 4 },
+                    turns: [
+                        {
+                            turnNumber: 1,
+                            timestamp: '2025-01-15 13:45:10',
+                            userMessage: 'システムエラーが発生して画面が真っ白になってしまいます',
+                            botMessage: 'システムエラーでお困りのようですね。以下の手順をお試しください。\n\n1. ブラウザの再読み込み（F5キーまたはCtrl+R）\n2. ブラウザのキャッシュクリア\n3. 別のブラウザでアクセス\n\nそれでも解決しない場合は、エラーメッセージをお教えください。',
+                            evaluation: 'bad'
+                        }
+                    ]
+                }
+            };
+
+            return sampleData[chatId] || sampleData['1'];
+        }
+
+        // 画面にデータを表示
+        function displayChatData(data) {
+            document.getElementById('chatId').textContent = data.id;
+            document.getElementById('startTime').textContent = data.startTime;
+            document.getElementById('endTime').textContent = data.endTime;
+            document.getElementById('turnCount').textContent = data.turnCount;
+
+            // 評価サマリーの更新
+            const evaluationSummaryElement = document.getElementById('userEvaluationSummary');
+            let summaryHTML = '';
+            
+            if (data.evaluationSummary.good > 0) {
+                summaryHTML += `<span class="eval-badge good">Good ${data.evaluationSummary.good}個</span>`;
+            }
+            if (data.evaluationSummary.bad > 0) {
+                summaryHTML += `<span class="eval-badge bad">Bad ${data.evaluationSummary.bad}個</span>`;
+            }
+            
+            if (summaryHTML === '') {
+                summaryHTML = '<span style="color: #64748b;">-</span>';
+            }
+            
+            evaluationSummaryElement.innerHTML = summaryHTML;
+
+            // 会話履歴の表示
+            const chatHistoryElement = document.getElementById('chatHistory');
+            chatHistoryElement.innerHTML = '';
+
+            data.turns.forEach(turn => {
+                const evaluationClass = turn.evaluation || 'none';
+                const evaluationText = turn.evaluation === 'good' ? 'Good' :
+                                     turn.evaluation === 'bad' ? 'Bad' : '-';
+                
+                const turnElement = document.createElement('div');
+                turnElement.className = 'chat-turn';
+                turnElement.innerHTML = `
+                    <div class="turn-header">
+                        <span class="turn-number">ターン ${turn.turnNumber}</span>
+                        <span class="turn-timestamp">${turn.timestamp}</span>
+                    </div>
+                    <div class="message user-message">
+                        <div class="message-label">ユーザー</div>
+                        <div class="message-content">${turn.userMessage}</div>
+                    </div>
+                    <div class="message bot-message">
+                        <div class="message-label">チャットボット</div>
+                        <div class="message-content">${turn.botMessage}</div>
+                    </div>
+                    <div class="turn-evaluation">
+                        <span class="info-label">このターンの評価:</span>
+                        <span class="eval-badge ${evaluationClass}">${evaluationText}</span>
+                    </div>
+                `;
+                chatHistoryElement.appendChild(turnElement);
+            });
+        }
+
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatId = getChatIdFromURL();
+            const chatData = loadChatData(chatId);
+            displayChatData(chatData);
+        });
+    </script>
+</body>
+</html>
