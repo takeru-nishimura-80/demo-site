@@ -16,22 +16,42 @@
                     <span>HR AI Chatbot</span>
                 </div>
                 
+                <!-- 使い方説明（トグル対応） -->
+                <div class="usage-guide">
+                    <button class="usage-toggle collapsed" id="usageToggle">
+                        <span class="usage-title">使い方</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div class="usage-content collapsed" id="usageContent">
+                        <ol class="usage-steps">
+                            <li>まずは「FAQ」のチャットで問い合わせてみましょう</li>
+                            <li>「FAQ」で解決しない場合は、「ドキュメント」で問い合わせてみましょう</li>
+                            <li>それでも解決しない場合は、担当者に問い合わせてください
+                                <div class="contact-info">
+                                    <div>e-mail : xxxx@company.com</div>
+                                    <div>tel : 080-1234-5678</div>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                
                 <!-- タブ切り替え -->
                 <div class="tab-container">
-                    <button class="tab-btn active" data-tab="notion">
-                        <span class="tab-icon">📝</span>
-                        <span>ドキュメント</span>
-                    </button>
-                    <button class="tab-btn" data-tab="faq">
+                    <button class="tab-btn active" data-tab="faq">
                         <span class="tab-icon">❓</span>
                         <span>FAQ</span>
+                    </button>
+                    <button class="tab-btn" data-tab="notion">
+                        <span class="tab-icon">📝</span>
+                        <span>ドキュメント</span>
                     </button>
                 </div>
                 
                 <!-- データソース表示 -->
                 <div class="data-source-info">
                     <span class="source-label">データソース:</span>
-                    <span class="source-name" id="sourceDisplay">ドキュメント</span>
+                    <span class="source-name" id="sourceDisplay">FAQ</span>
                 </div>
             </div>
             <div class="sidebar-content">

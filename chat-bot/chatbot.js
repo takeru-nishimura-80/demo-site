@@ -13,7 +13,7 @@ const stopResponseBtn = document.getElementById('stopResponseBtn');
 const sourceDisplay = document.getElementById('sourceDisplay');
 
 // タブ機能用の変数
-let currentTab = 'notion';
+let currentTab = 'faq';
 const chatHistory = {
     notion: {
         messages: [],
@@ -29,12 +29,16 @@ const chatHistory = {
 let currentResponseTimeout = null;
 let isResponding = false;
 
+// IME制御用の変数
+let isComposing = false;
+
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
     initializeChatbot();
     setupNewChatButton();
     setupStopResponseButton();
     setupTabSwitching();
+    setupUsageToggle();
 });
 
 // チャットボットの初期化
@@ -45,9 +49,19 @@ function initializeChatbot() {
         sendButton.disabled = this.value.trim() === '';
     });
 
-    // Enter送信
+    // IME変換開始
+    messageInput.addEventListener('compositionstart', function() {
+        isComposing = true;
+    });
+
+    // IME変換終了
+    messageInput.addEventListener('compositionend', function() {
+        isComposing = false;
+    });
+
+    // Enter送信（IME変換中は無視）
     messageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
             e.preventDefault();
             sendMessage();
         }
@@ -243,10 +257,15 @@ function sendMessage() {
     currentResponseTimeout = setTimeout(() => {
         if (isResponding) {
             hideTypingIndicator();
-            const botResponse = generateBotResponse(message);
-            addMessage(botResponse, 'bot');
-            hideStopResponseButton();
-            isResponding = false;
+            // タイピングインジケーターが確実に非表示になってからボットメッセージを表示
+            setTimeout(() => {
+                if (isResponding) {
+                    const botResponse = generateBotResponse(message);
+                    addMessage(botResponse, 'bot');
+                    hideStopResponseButton();
+                    isResponding = false;
+                }
+            }, 100);
         }
     }, responseDelay);
 }
@@ -320,32 +339,14 @@ function generateBotResponse(userMessage) {
     // タブごとの応答設定
     const tabResponses = {
         notion: {
-            responses: {
-                '人事制度': '【ドキュメント】人事制度についてお答えします。ドキュメントに保存された最新の人事制度ドキュメントから情報を検索しています。具体的にどのような内容について知りたいですか？',
-                '給与': '【ドキュメント】給与体系について説明いたします。ドキュメントの給与規定ページから最新情報を参照しています。基本給、賞与、各種手当について詳しくご案内できます。',
-                '評価': '【ドキュメント】人事評価制度についてお答えします。ドキュメントの評価制度ドキュメントから最新の評価基準、評価期間、フィードバックプロセスをご案内します。',
-                '昇進': '【ドキュメント】昇進制度について説明いたします。ドキュメントのキャリアパス資料から昇進の条件、評価基準について詳しくご案内できます。',
-                '休暇': '【ドキュメント】休暇制度についてお答えします。ドキュメントの休暇規定から有給休暇、特別休暇、育児休暇の詳細をご確認いただけます。',
-                '福利厚生': '【ドキュメント】福利厚生制度について説明いたします。ドキュメントの福利厚生ページから健康保険、退職金制度、研修制度の最新情報をお伝えします。',
-                '研修': '【ドキュメント】研修制度についてお答えします。ドキュメントの人材開発ページから新人研修、スキルアップ研修、リーダーシップ研修について詳しくご案内します。',
-                '働き方': '【ドキュメント】働き方改革の取り組みについて説明いたします。ドキュメントのワークスタイルページからリモートワーク、フレックスタイムの詳細をお伝えします。'
-            },
+            commonResponse: '【ドキュメント】ご質問ありがとうございます。ドキュメントに保存された最新の人事制度情報から回答いたします。給与体系、評価制度、休暇制度、福利厚生、研修制度、働き方改革など、幅広い人事制度についてご案内できます。<br><br>参照元：<a href="https://company.notion.site/docs/hr-database" target="_blank">https://company.notion.site/docs/hr-database</a>',
             defaultGreeting: 'こんにちは！HR AI アシスタント（ドキュメント版）です。ドキュメントに保存された最新の人事制度情報からお答えします。何でもお聞きください。📝',
-            defaultResponse: 'ご質問ありがとうございます。ドキュメントの人事制度データベースから情報を検索しています。より具体的な内容をお聞かせください。<br><br>📝 ドキュメントから検索可能な項目：<br>• 給与体系・昇進制度<br>• 休暇・福利厚生制度<br>• 評価制度・研修制度<br>• 働き方改革の取り組み'
+            defaultResponse: 'ご質問ありがとうございます。ドキュメントの人事制度データベースから情報を検索しています。より具体的な内容をお聞かせください。<br><br>📝 ドキュメントから検索可能な項目：<br>• 給与体系・昇進制度<br>• 休暇・福利厚生制度<br>• 評価制度・研修制度<br>• 働き方改革の取り組み<br><br>参照元：<a href="https://company.notion.site/docs/hr-database" target="_blank">https://company.notion.site/docs/hr-database</a>'
         },
         faq: {
-            responses: {
-                '人事制度': '【FAQ】人事制度についてお答えします。よくある質問データベースから関連する質問と回答をご紹介します。',
-                '給与': '【FAQ】給与に関するよくある質問から回答します。給与計算、昇給、賞与についてのFAQをご確認ください。',
-                '評価': '【FAQ】評価制度に関するよくある質問をご紹介します。評価基準や面談についてのFAQをご覧いただけます。',
-                '昇進': '【FAQ】昇進に関するよくある質問をお答えします。昇進の条件や手続きについてのFAQをご確認ください。',
-                '休暇': '【FAQ】休暇制度に関するよくある質問をご紹介します。有給取得や各種休暇申請のFAQをご覧ください。',
-                '福利厚生': '【FAQ】福利厚生に関するよくある質問をお答えします。各種制度の利用方法についてのFAQをご確認ください。',
-                '研修': '【FAQ】研修に関するよくある質問をご紹介します。研修申込みや受講についてのFAQをご覧いただけます。',
-                '働き方': '【FAQ】働き方に関するよくある質問をお答えします。リモートワークやフレックス制度のFAQをご確認ください。'
-            },
+            commonResponse: '【FAQ】ご質問ありがとうございます。よくある質問データベースから関連する回答をご案内いたします。給与、評価、休暇、福利厚生、研修、働き方などの人事制度に関するFAQを検索して、最適な回答をお探しします。<br><br>参照元：<a href="https://company.example.com/faq" target="_blank">https://company.example.com/faq</a>',
             defaultGreeting: 'こんにちは！HR AI アシスタント（FAQ版）です。よくある質問データベースから最適な回答をお探しします。お気軽にお聞きください。❓',
-            defaultResponse: 'ご質問ありがとうございます。FAQデータベースから関連する質問を検索しています。より具体的な内容をお聞かせください。<br><br>❓ FAQ検索可能な項目：<br>• 給与・評価に関するFAQ<br>• 休暇・福利厚生のFAQ<br>• 研修・キャリアのFAQ<br>• 各種手続きのFAQ'
+            defaultResponse: 'ご質問ありがとうございます。FAQデータベースから関連する質問を検索しています。より具体的な内容をお聞かせください。<br><br>❓ FAQ検索可能な項目：<br>• 給与・評価に関するFAQ<br>• 休暇・福利厚生のFAQ<br>• 研修・キャリアのFAQ<br>• 各種手続きのFAQ<br><br>参照元：<a href="https://company.example.com/faq" target="_blank">https://company.example.com/faq</a>'
         }
     };
 
@@ -365,15 +366,45 @@ function generateBotResponse(userMessage) {
         return currentTabData.defaultGreeting;
     }
 
-    // キーワードマッチング
-    for (let key in currentTabData.responses) {
-        if (userMessage.includes(key)) {
-            return currentTabData.responses[key];
-        }
+    // キーワードマッチング（人事制度関連の質問の場合は共通回答を返す）
+    const hrKeywords = ['人事制度', '給与', '評価', '昇進', '休暇', '福利厚生', '研修', '働き方'];
+    const hasHrKeyword = hrKeywords.some(keyword => userMessage.includes(keyword));
+    
+    if (hasHrKeyword) {
+        return currentTabData.commonResponse;
     }
 
     // デフォルトレスポンス
     return currentTabData.defaultResponse;
+}
+
+// 使い方説明のトグル機能をセットアップ
+function setupUsageToggle() {
+    const usageToggle = document.getElementById('usageToggle');
+    const usageContent = document.getElementById('usageContent');
+    
+    if (!usageToggle || !usageContent) return;
+    
+    // 初期状態は閉じた状態
+    let isCollapsed = true;
+    
+    // 初期状態を閉じた状態に設定
+    usageContent.classList.add('collapsed');
+    usageToggle.classList.add('collapsed');
+    
+    usageToggle.addEventListener('click', function() {
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+            // 閉じる
+            usageContent.classList.add('collapsed');
+            usageToggle.classList.add('collapsed');
+        } else {
+            // 開く
+            usageContent.classList.remove('collapsed');
+            usageToggle.classList.remove('collapsed');
+        }
+    });
 }
 
 // ユーティリティ関数
