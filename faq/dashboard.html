@@ -217,14 +217,14 @@
                         <div class="stat-value">8</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer;" onclick="navigateToFilteredChatLog('good')">
                         <div class="stat-header">
                             <div class="stat-title">Good数</div>
                         </div>
                         <div class="stat-value">342</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer;" onclick="navigateToFilteredChatLog('bad')">
                         <div class="stat-header">
                             <div class="stat-title">Bad数</div>
                         </div>
@@ -237,7 +237,7 @@
                     <!-- Pending Approvals -->
                     <div class="pending-approvals">
                         <div class="pending-header">
-                            <h2 class="section-title">確認待ちFAQ候補</h2>
+                            <h2 class="section-title">AIが提案するFAQ候補</h2>
                         </div>
                         <div class="pending-items">
                             <div class="pending-item">
@@ -311,6 +311,12 @@
                 console.log('Button clicked:', this.textContent.trim());
             });
         });
+
+        // Good/Badカードクリック時の会話ログ管理画面への遷移
+        function navigateToFilteredChatLog(evaluation) {
+            console.log('評価別会話ログ管理画面へ遷移:', evaluation);
+            window.location.href = `chat-log-management.html?evaluation=${evaluation}`;
+        }
 
     </script>
 </body>

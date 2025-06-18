@@ -731,9 +731,36 @@
             });
         });
 
+        // URLパラメータから評価フィルタを取得・設定
+        function initializeEvaluationFilter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const evaluation = urlParams.get('evaluation');
+            
+            if (evaluation) {
+                const evaluationFilter = document.getElementById('evaluationFilter');
+                if (evaluationFilter) {
+                    evaluationFilter.value = evaluation;
+                    
+                    // 詳細検索条件を展開
+                    const conditions = document.getElementById('searchConditions');
+                    const toggle = document.getElementById('searchToggle');
+                    conditions.classList.add('expanded');
+                    toggle.classList.add('expanded');
+                    
+                    // 自動的に検索を実行
+                    setTimeout(() => {
+                        searchChatLogs();
+                    }, 100);
+                    
+                    console.log('評価フィルタを設定しました:', evaluation);
+                }
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setDefaultDateRange();
+            initializeEvaluationFilter();
         });
     </script>
 </body>
